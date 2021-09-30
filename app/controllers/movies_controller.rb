@@ -8,6 +8,14 @@ class MoviesController < ApplicationController
   
     def index
       @movies = Movie.all
+      
+      if params[:sort]
+        @sort_by=session[:sort]=params[:sort] 
+      else @sort_by=session[:sort] 
+      end
+      @movies = @movies.order(@sort_by + "ASC")
+      
+      
     end
   
     def new
