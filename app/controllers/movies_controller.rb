@@ -7,13 +7,35 @@ class MoviesController < ApplicationController
     end
   
     def index
-      @movies = Movie.all
+      @all_ratings=['G','PG','PG-13','R']
+      # put ratings into a hash to achive currect checkbox fields
+      hashed_ratings=Hash[@all_ratings.map {|rating| [rating, rating]}]
       
+      # Implimentation for part 1.1: Sort by Title || Release Date
       if params[:sort]
-        @sort_by=session[:sort]=params[:sort] 
+        @sort_by=params[:sort] 
       else @sort_by=session[:sort] 
       end
-      @movies = @movies.order(@sort_by + "ASC")
+      
+      # Implimentation for part 2.1: filter by rating
+      if params[:ratings]
+        @picked_ratings=session[:ratings]=params[:ratings] 
+      else 
+        if session[:ratings] 
+          @picked_ratings=session[:ratings] 
+        else @picked_ratings=hashed_ratings
+        end  
+      end
+      
+      # Implimentation for part 1.2 adn 2.2:
+      if params[:sort]!=session[:sort] or params[:ratings]!=session[:ratings]
+        session[:ratings]=@picked_ratings
+        session[:sort]=@sort_by
+        redirect_to movies_path(sort: @sort_by , ratings: @picked_ratings)
+      end
+      
+      @movies = Movie.where(rating: @picked_ratings.keys)
+      @movies = @movies.order(@sort_by) 
       
       
     end
@@ -52,4 +74,4 @@ class MoviesController < ApplicationController
     def movie_params
       params.require(:movie).permit(:title, :rating, :description, :release_date)
     end
-  end
+end
