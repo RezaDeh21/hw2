@@ -12,6 +12,7 @@ class MoviesController < ApplicationController
       hashed_ratings=Hash[@all_ratings.map {|rating| [rating, rating]}]
       
       # Implimentation for part 1.1: Sort by Title || Release Date
+      # session[] used to remember sesssions and to if all filters are unchecked
       if params[:sort]
         @sort_by=params[:sort] 
       else @sort_by=session[:sort] 
@@ -27,10 +28,12 @@ class MoviesController < ApplicationController
         end  
       end
       
-      # Implimentation for part 1.2 adn 2.2:
+      # Implimentation for part 1.2, 2.2, 3:
       if params[:sort]!=session[:sort] or params[:ratings]!=session[:ratings]
         session[:ratings]=@picked_ratings
         session[:sort]=@sort_by
+        flash.keep
+        # redirect to new URI containing the appropriate parameters
         redirect_to movies_path(sort: @sort_by , ratings: @picked_ratings)
       end
       
